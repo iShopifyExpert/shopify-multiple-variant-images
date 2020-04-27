@@ -1,0 +1,21 @@
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.4.1/jquery.min.js"></script>
+{% capture optionname %}{% for tag in product.tags %}{% if tag contains 'multi-images' %}{% assign optname = tag | remove: 'multi-images-' %}{{optname | capitalize}}{% endif %}{% endfor %}{% endcapture %}
+{% assign option_name = optionname %}
+{% if product.options contains option_name %}
+<script>
+$( document ).ready(function() {
+  var thumbnails = $('img[src*="/products/"]').not('.product-recommendations img').not('a[href^="/collections/"] img').not('a[href^="/products/"] img').not('header img').not('#drawer img').not(':first'); 
+  var optionSelect; {% assign option_index = 0 %}{% for option in product.options %}{% if option == option_name %}{% assign option_index = forloop.index0 %}{% endif %}{% endfor %}{% if product.options.size == 1 %}
+  optionSelect = '.single-option-selector'; {% else %}
+  optionSelect = 'label:contains({{ option_name }}) + .single-option-selector'; {% endif %}
+  $('form[action="/cart/add"]').on('change', optionSelect, function() {
+    var optionValue = $(this).val();
+    thumbnails.each(function() {
+      var wrapper = $(this); while ( wrapper.parents('.swiper-slide').children().length === 1 ) { wrapper = wrapper.parents('.swiper-slide'); }
+      if ($(this).attr('alt') === optionValue) { wrapper.show(); } else { wrapper.hide(); }
+      //if ($('.swiper-slide:visible').length < 4 ) { $('.swiper-pagination').hide(); } else { $('.swiper-pagination').show(); }
+    });
+  });
+});
+</script>
+{% endif %}
